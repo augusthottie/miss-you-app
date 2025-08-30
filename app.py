@@ -145,11 +145,14 @@ if __name__ == "__main__":
     missing_required = [var for var in required_vars if not os.getenv(var)]
     missing_optional = [var for var in optional_vars if not os.getenv(var)]
     if missing_required:
-        print(f"Error: Missing required environment variables: {', '.join(missing_required)}")
+        print(
+            f"Error: Missing required environment \
+                variables: {', '.join(missing_required)}"
+        )
         print("   Please set DATABASE_URL to continue")
         exit(1)
     if missing_optional:
-        print("Warning: Missing optional environment variables: "
+        print(f"Warning: Missing optional environment variables: "
               f"{', '.join(missing_optional)}")
         print("   Some features may not work without these variables.")
     else:

@@ -76,7 +76,10 @@ def exists(username):
     conn = psycopg.connect(DATABASE_URL)
     try:
         with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
-            cursor.execute('SELECT id FROM users WHERE username = %s', (username,))
+            cursor.execute(
+                'SELECT id FROM users WHERE username = %s',
+                (username,)
+            )
             result = cursor.fetchone()
             return result is not None
     except Exception as e:
@@ -91,13 +94,14 @@ def register_device_token(user_id, device_token):
     conn = psycopg.connect(DATABASE_URL)
     try:
         with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
-            # Remove any existing tokens for this user (optional - you might want
-            # to keep multiple devices)
+            # Remove any existing tokens for this user
+            # (optional - you might want to keep multiple devices)
             cursor.execute(
                 'DELETE FROM user_devices WHERE user_id = %s', (user_id,))
             # Add the new token
             cursor.execute(
-                'INSERT INTO user_devices (user_id, device_token) VALUES (%s, %s)',
+                'INSERT INTO user_devices (user_id, device_token) '
+                'VALUES (%s, %s)',
                 (user_id, device_token))
         conn.commit()
     except Exception as e:
@@ -130,7 +134,10 @@ def get_user(username):
     conn = psycopg.connect(DATABASE_URL)
     try:
         with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
-            cursor.execute('SELECT id FROM users WHERE username = %s', (username,))
+            cursor.execute(
+                'SELECT id FROM users WHERE username = %s',
+                (username,)
+            )
             result = cursor.fetchone()
             return result['id'] if result else None
     except Exception as e:
