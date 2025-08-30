@@ -1,7 +1,23 @@
 import firebase_admin
+import os
 from firebase_admin import credentials, messaging
 
-cred = credentials.Certificate("serviceAccountKey.json")
+# Initialize Firebase with credentials from environment
+cred = None
+if os.getenv('GOOGLE_APPLICATION_CREDENTIALS'):
+    # Use service account file path from environment
+    cred = credentials.Certificate(os.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
+elif os.getenv('FIREBASE_SERVICE_ACCOUNT_KEY'):
+    # Use service account key JSON from environment variable
+    import json
+    service_account_info = json.loads(
+        os.getenv('FIREBASE_SERVICE_ACCOUNT_KEY')
+    )
+    cred = credentials.Certificate(service_account_info)
+else:
+    # Try to use default credentials (for local development)
+    cred = credentials.ApplicationDefault()
+
 firebase_admin.initialize_app(cred)
 
 

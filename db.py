@@ -1,7 +1,7 @@
 import sqlite3
 from contextlib import contextmanager
 import os
-# from firebase import send_fcm_notification
+from firebase import send_fcm_notification
 
 DATABASE_FILE_PATH = "database.db"
 
@@ -87,21 +87,21 @@ def notify(source_id, target_id, title, description):
         return False
 
     # Prepare notification data
-#    notification_data = {
-#        "source_user_id": str(source_id),
-#        "target_user_id": str(target_id),
-#        "type": "miss_you_notification"
-#    }
+    notification_data = {
+       "source_user_id": str(source_id),
+       "target_user_id": str(target_id),
+       "type": "miss_you_notification"
+    }
 
     # Send to all user's devices
     success_count = 0
-    for _ in device_tokens:
-        # if send_fcm_notification(
-        # device_token,
-        # title,
-        # description,
-        # notification_data
-        # ):
+    for device_token in device_tokens:
+        send_fcm_notification(
+            device_token,
+            title,
+            description,
+            notification_data
+        )
 
         with get_db_connection() as conn:
             cursor = conn.cursor()

@@ -29,7 +29,7 @@ A Flask-based backend application for sending personalized "miss you" notificati
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/augusthottie/miss-you-app
    cd miss-you-app
    ```
 
@@ -151,42 +151,6 @@ GET /mark_as_read?notification_id=<id>
 }
 ```
 
-## Database Schema
-
-### Users Table
-```sql
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL
-);
-```
-
-### User Devices Table
-```sql
-CREATE TABLE user_devices (
-    id INTEGER PRIMARY KEY,
-    user_id INTEGER,
-    device_token TEXT NOT NULL,
-    platform TEXT DEFAULT 'ios',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id)
-);
-```
-
-### Notifications Table
-```sql
-CREATE TABLE notifications (
-    id INTEGER PRIMARY KEY,
-    source_id INTEGER,
-    target_id INTEGER,
-    title TEXT NOT NULL,
-    description TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_read BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (source_id) REFERENCES users (id),
-    FOREIGN KEY (target_id) REFERENCES users (id)
-);
-```
 
 ## Usage Examples
 
@@ -282,19 +246,3 @@ miss-you-app/
 - Implement proper authentication and authorization
 - Validate all input data
 - Use environment variables for sensitive configuration
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-[Add your license here]
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact [your-email@example.com]
