@@ -56,7 +56,7 @@ def init_db():
 def register(username):
     conn = psycopg.connect(DATABASE_URL)
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             cursor.execute(
                 'INSERT INTO users (username) VALUES (%s) RETURNING id',
                 (username,)
@@ -75,7 +75,7 @@ def register(username):
 def exists(username):
     conn = psycopg.connect(DATABASE_URL)
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             cursor.execute('SELECT id FROM users WHERE username = %s', (username,))
             result = cursor.fetchone()
             return result is not None
@@ -90,7 +90,7 @@ def register_device_token(user_id, device_token):
     """Register a device token for a user"""
     conn = psycopg.connect(DATABASE_URL)
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             # Remove any existing tokens for this user (optional - you might want
             # to keep multiple devices)
             cursor.execute(
@@ -112,7 +112,7 @@ def get_user_device_tokens(user_id):
     """Get all device tokens for a user"""
     conn = psycopg.connect(DATABASE_URL)
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             cursor.execute(
                 'SELECT device_token FROM user_devices WHERE user_id = %s',
                 (user_id,))
@@ -129,7 +129,7 @@ def get_user(username):
     """Get a user by username"""
     conn = psycopg.connect(DATABASE_URL)
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             cursor.execute('SELECT id FROM users WHERE username = %s', (username,))
             result = cursor.fetchone()
             return result['id'] if result else None
@@ -170,7 +170,7 @@ def notify(source_id, target_id, title, description):
                 success_count += 1
 
         # Insert notification into database
-        with conn.cursor() as cursor:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             cursor.execute(
                 'INSERT INTO notifications '
                 '(source_id, target_id, title, description) '
@@ -194,7 +194,7 @@ def mark_as_read(notification_id):
     """Mark a notification as read"""
     conn = psycopg.connect(DATABASE_URL)
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             cursor.execute(
                 'UPDATE notifications SET is_read = TRUE WHERE id = %s',
                 (notification_id,)
@@ -213,7 +213,7 @@ def get_all_users():
     """Get all users"""
     conn = psycopg.connect(DATABASE_URL)
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             cursor.execute('SELECT id, username FROM users')
             results = cursor.fetchall()
             return [(row['id'], row['username']) for row in results]
@@ -228,7 +228,7 @@ def get_notifications(user_id):
     """Get all notifications for a user"""
     conn = psycopg.connect(DATABASE_URL)
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             cursor.execute(
                 'SELECT id, title, description, created_at, is_read '
                 'FROM notifications WHERE target_id = %s AND is_read = FALSE',

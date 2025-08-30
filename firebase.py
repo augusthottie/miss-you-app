@@ -1,6 +1,6 @@
 import firebase_admin
 import os
-from firebase_admin import credentials, messaging
+from firebase_admin import credentials, messaging  # pyright: ignore[reportMissingImports]
 
 # Initialize Firebase with credentials from environment
 cred = None
