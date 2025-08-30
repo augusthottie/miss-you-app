@@ -2,10 +2,22 @@ import google.generativeai as genai
 import os
 import json
 
+# Initialize Gemini AI with error handling
+gemini_available = False
+gemini_model = None
 
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
-gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+try:
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if api_key:
+        genai.configure(api_key=api_key)
+        gemini_model = genai.GenerativeModel('gemini-pro')
+        gemini_available = True
+        print("🤖 Gemini AI initialized successfully")
+    else:
+        print("⚠️  GOOGLE_API_KEY not found, AI features will be disabled")
+except Exception as e:
+    print(f"❌ Gemini AI initialization failed: {e}")
+    print("   AI features will not be available")
 
 
 def notify_prompt(source_username, target_username):
@@ -32,20 +44,37 @@ def notify_prompt(source_username, target_username):
 
 
 def generate_notify_message(source_username, target_username):
-    prompt = notify_prompt(source_username, target_username)
-    response = gemini_model.generate_content(prompt)
+    """Generate notification message using Gemini AI or fallback"""
+    if not gemini_available or not gemini_model:
+        print("⚠️  Using fallback message generation (Gemini not available)")
+        title = f"Miss you, {target_username}!"
+        description = f"{source_username} is thinking about you 💭"
+        return title, description
 
-    # Remove any leading/trailing whitespace and ```json/``` markers
-    cleaned_text = response.text.strip()
-    if cleaned_text.startswith('```json'):
-        cleaned_text = cleaned_text[7:]
-    if cleaned_text.endswith('```'):
-        cleaned_text = cleaned_text[:-3]
-    cleaned_text = cleaned_text.strip()
+    try:
+        prompt = notify_prompt(source_username, target_username)
+        response = gemini_model.generate_content(prompt)
 
-    parsed = json.loads(cleaned_text)
+        # Remove any leading/trailing whitespace and ```json/``` markers
+        cleaned_text = response.text.strip()
+        if cleaned_text.startswith('```json'):
+            cleaned_text = cleaned_text[7:]
+        if cleaned_text.endswith('```'):
+            cleaned_text = cleaned_text[:-3]
+        cleaned_text = cleaned_text.strip()
 
-    title = parsed["title"]
-    description = parsed["description"]
+        parsed = json.loads(cleaned_text)
 
-    return title, description
+        default_title = f"Miss you, {target_username}!"
+        default_desc = f"{source_username} is thinking about you"
+        title = parsed.get("title", default_title)
+        description = parsed.get("description", default_desc)
+
+        return title, description
+
+    except Exception as e:
+        print(f"❌ Error generating AI message: {e}")
+        print("   Using fallback message")
+        fallback_title = f"Miss you, {target_username}!"
+        fallback_desc = f"{source_username} is thinking about you 💭"
+        return fallback_title, fallback_desc

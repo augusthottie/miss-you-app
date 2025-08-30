@@ -138,11 +138,28 @@ def internal_error(_):
 
 
 if __name__ == "__main__":
+    # Check for required environment variables
+    required_vars = ['GOOGLE_API_KEY', 'FIREBASE_SERVICE_ACCOUNT_KEY']
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+
+    if missing_vars:
+        missing_list = ', '.join(missing_vars)
+        print(f"⚠️  Warning: Missing environment variables: {missing_list}")
+        print("   Some features may not work without these variables.")
+    else:
+        print("✅ All required environment variables found")
+
     # Initialize database
     init_db()
 
     # Get port from environment or default to 8000
     port = int(os.getenv('PORT', 8000))
+    print(f"🚀 Starting Miss You App on port {port}")
+    print("📊 Available endpoints:")
+    print(f"   Health: http://localhost:{port}/health")
+    print(f"   Register: http://localhost:{port}/register")
+    print(f"   Notify: http://localhost:{port}/notify")
 
-    # Run in production mode
-    app.run(host='0.0.0.0', port=port, debug=False)
+    # Run in development mode if DEBUG is set
+    debug = os.getenv('DEBUG', 'false').lower() == 'true'
+    app.run(host='0.0.0.0', port=port, debug=debug)
