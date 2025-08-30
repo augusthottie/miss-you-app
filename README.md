@@ -213,14 +213,14 @@ The app supports Firebase Cloud Messaging for sending push notifications to iOS 
 
 ### Running the Development Server
 ```bash
-python __main__.py
+python app.py
 ```
 The server will start on `http://localhost:5000`
 
 ### Project Structure
 ```
 miss-you-app/
-├── __main__.py              # Flask app and API endpoints
+├── app.py                   # Flask app and API endpoints
 ├── db.py                    # Database operations
 ├── ai.py                    # Gemini AI integration
 ├── firebase.py              # Firebase push notifications
