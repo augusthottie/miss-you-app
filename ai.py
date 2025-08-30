@@ -1,6 +1,10 @@
 import google.generativeai as genai
 import os
 import json
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Initialize Gemini AI with error handling
 gemini_available = False
@@ -12,12 +16,12 @@ try:
         genai.configure(api_key=api_key)
         gemini_model = genai.GenerativeModel('gemini-pro')
         gemini_available = True
-        print("🤖 Gemini AI initialized successfully")
+        print("Gemini AI initialized successfully")
     else:
-        print("⚠️  GOOGLE_API_KEY not found, AI features will be disabled")
+        print("GOOGLE_API_KEY not found, AI features will be disabled")
 except Exception as e:
-    print(f"❌ Gemini AI initialization failed: {e}")
-    print("   AI features will not be available")
+    print(f"Gemini AI initialization failed: {e}")
+    print("AI features will not be available")
 
 
 def notify_prompt(source_username, target_username):
@@ -46,9 +50,9 @@ def notify_prompt(source_username, target_username):
 def generate_notify_message(source_username, target_username):
     """Generate notification message using Gemini AI or fallback"""
     if not gemini_available or not gemini_model:
-        print("⚠️  Using fallback message generation (Gemini not available)")
+        print("Using fallback message generation (Gemini not available)")
         title = f"Miss you, {target_username}!"
-        description = f"{source_username} is thinking about you 💭"
+        description = f"{source_username} is thinking about you"
         return title, description
 
     try:
@@ -73,8 +77,8 @@ def generate_notify_message(source_username, target_username):
         return title, description
 
     except Exception as e:
-        print(f"❌ Error generating AI message: {e}")
-        print("   Using fallback message")
+        print(f"Error generating AI message: {e}")
+        print("Using fallback message")
         fallback_title = f"Miss you, {target_username}!"
-        fallback_desc = f"{source_username} is thinking about you 💭"
+        fallback_desc = f"{source_username} is thinking about you"
         return fallback_title, fallback_desc

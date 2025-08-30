@@ -25,6 +25,7 @@ A Flask-based backend application for sending personalized "miss you" notificati
 
 - Python 3.8+ (for development)
 - Docker & Docker Compose (for production deployment)
+- PostgreSQL database (local or cloud)
 - Google Gemini API key
 - Firebase project with service account key
 - iOS/Android app for receiving notifications
@@ -49,20 +50,27 @@ A Flask-based backend application for sending personalized "miss you" notificati
    ```
 
 4. **Set up environment variables**
-   Create a `.env` file in the root directory:
-   ```env
-   GOOGLE_API_KEY=your_gemini_api_key_here
-   FIREBASE_SERVICE_ACCOUNT_PATH=serviceAccountKey.json
+   Copy the sample environment file and configure it:
+   ```bash
+   cp sample.env .env
+   # Edit .env with your actual values
    ```
 
-5. **Set up Firebase**
+   The `.env` file should contain:
+   ```env
+   DATABASE_URL=postgresql://postgres:postgres123@localhost:5432/miss_you_app
+   GOOGLE_API_KEY=your_gemini_api_key_here
+   FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account","project_id":"your-project",...}
+   ```
+
+5. **Set up Firebase** (Optional)
    - Download your Firebase service account key from Firebase Console
    - Place it in the root directory as `serviceAccountKey.json`
    - Add it to `.gitignore` for security
 
-6. **Initialize the database**
+6. **Start the application**
    ```bash
-   python __main__.py
+   python app.py
    ```
 
 ## API Endpoints
@@ -326,7 +334,42 @@ gunicorn --config gunicorn.conf.py app:app
 |----------|-------------|----------|
 | `GOOGLE_API_KEY` | Google Gemini API key | Yes |
 | `FIREBASE_SERVICE_ACCOUNT_KEY` | Firebase service account JSON | Yes |
+| `DATABASE_URL` | PostgreSQL connection URL | Yes |
 | `PORT` | Server port (default: 8000) | No |
+| `DEBUG` | Enable debug mode (`true`/`false`) | No |
+
+### PostgreSQL Setup
+
+**Option 1: Local PostgreSQL**
+```bash
+# Install PostgreSQL locally
+brew install postgresql  # macOS
+sudo apt-get install postgresql  # Ubuntu
+
+# Start PostgreSQL service
+brew services start postgresql  # macOS
+sudo systemctl start postgresql  # Ubuntu
+
+# Create database
+createdb miss_you_app
+
+# Set DATABASE_URL in .env
+DATABASE_URL=postgresql://username:password@localhost:5432/miss_you_app
+```
+
+**Option 2: Docker PostgreSQL**
+```bash
+# Run PostgreSQL in Docker
+docker run --name postgres -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=miss_you_app -p 5432:5432 -d postgres:15
+
+# Set DATABASE_URL in .env
+DATABASE_URL=postgresql://postgres:mypassword@localhost:5432/miss_you_app
+```
+
+**Option 3: Cloud PostgreSQL (Heroku, AWS RDS, etc.)**
+```env
+DATABASE_URL=postgresql://username:password@host:5432/database
+```
 
 ## Security Considerations
 

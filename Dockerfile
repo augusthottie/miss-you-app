@@ -15,6 +15,7 @@ RUN apt-get update \
         gcc \
         g++ \
         curl \
+        postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies

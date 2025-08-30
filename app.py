@@ -139,18 +139,29 @@ def internal_error(_):
 
 if __name__ == "__main__":
     # Check for required environment variables
-    required_vars = ['GOOGLE_API_KEY', 'FIREBASE_SERVICE_ACCOUNT_KEY']
-    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    required_vars = ['DATABASE_URL']
+    optional_vars = ['GOOGLE_API_KEY', 'FIREBASE_SERVICE_ACCOUNT_KEY']
 
-    if missing_vars:
-        missing_list = ', '.join(missing_vars)
-        print(f"⚠️  Warning: Missing environment variables: {missing_list}")
+    missing_required = [var for var in required_vars if not os.getenv(var)]
+    missing_optional = [var for var in optional_vars if not os.getenv(var)]
+    if missing_required:
+        print(f"Error: Missing required environment variables: {', '.join(missing_required)}")
+        print("   Please set DATABASE_URL to continue")
+        exit(1)
+    if missing_optional:
+        print("Warning: Missing optional environment variables: "
+              f"{', '.join(missing_optional)}")
         print("   Some features may not work without these variables.")
     else:
-        print("✅ All required environment variables found")
+        print("All environment variables found")
 
-    # Initialize database
-    init_db()
+    # Try to initialize database (will work if database is ready)
+    try:
+        init_db()
+    except Exception as e:
+        print("Database initialization failed (this is normal on first run):",
+              str(e))
+        print("Database will be initialized when PostgreSQL is ready")
 
     # Get port from environment or default to 8000
     port = int(os.getenv('PORT', 8000))
