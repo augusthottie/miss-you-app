@@ -17,10 +17,14 @@ A Flask-based backend application for sending personalized "miss you" notificati
 - **AI**: Google Gemini AI
 - **Push Notifications**: Firebase Cloud Messaging
 - **Environment Management**: python-dotenv
+- **Production Server**: Gunicorn (WSGI)
+- **Reverse Proxy**: Nginx
+- **Containerization**: Docker & Docker Compose
 
 ## Prerequisites
 
-- Python 3.8+
+- Python 3.8+ (for development)
+- Docker & Docker Compose (for production deployment)
 - Google Gemini API key
 - Firebase project with service account key
 - iOS/Android app for receiving notifications
@@ -194,6 +198,38 @@ response = requests.post("http://localhost:5000/notify", json={
 })
 ```
 
+## API Endpoints
+
+### User Management
+- `GET /register?username=<username>&device_token=<token>` - Register a new user
+- `GET /exists?username=<username>` - Check if username exists
+- `POST /users` - Get all users
+
+### Notifications
+- `POST /notify` - Send a notification (supports AI-generated content)
+- `POST /notifications` - Get user notifications
+- `GET /mark_as_read?notification_id=<id>` - Mark notification as read
+
+### Health Check
+- `GET /health` - Application health status
+
+### Request Examples
+
+```bash
+# Register user
+curl "http://localhost:5000/register?username=john_doe&device_token=your_device_token"
+
+# Send notification
+curl -X POST http://localhost:5000/notify \
+  -H "Content-Type: application/json" \
+  -d '{"source_id": 1, "target_id": 2}'
+
+# Get notifications
+curl -X POST http://localhost:5000/notifications \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": 2}'
+```
+
 ## AI Message Generation
 
 The app uses Google Gemini AI to generate personalized messages. When no custom title/description is provided, the AI creates:
@@ -227,6 +263,10 @@ miss-you-app/
 ├── requirements.txt         # Python dependencies
 ├── .env                     # Environment variables
 ├── serviceAccountKey.json   # Firebase service account
+├── Dockerfile               # Docker container configuration
+├── docker-compose.yml       # Multi-service deployment
+├── gunicorn.conf.py         # Production server configuration
+├── nginx.conf               # Reverse proxy configuration
 ├── queries/
 │   └── init.sql            # Database initialization
 └── README.md               # This file
@@ -238,6 +278,55 @@ miss-you-app/
 |----------|-------------|----------|
 | `GOOGLE_API_KEY` | Google Gemini API key | Yes |
 | `FIREBASE_SERVICE_ACCOUNT_PATH` | Path to Firebase service account JSON | Yes |
+
+## Production Deployment
+
+The app includes production-ready deployment configurations for containerized environments.
+
+### Docker Deployment
+
+1. **Prerequisites:**
+   - Docker and Docker Compose installed
+   - Environment variables set up
+
+2. **Quick Start:**
+   ```bash
+   # Set environment variables
+   export GOOGLE_API_KEY="your_gemini_api_key"
+   export FIREBASE_SERVICE_ACCOUNT_KEY='{"type":"service_account",...}'
+
+   # Build and run
+   docker-compose up --build -d
+   ```
+
+3. **Access your app:**
+   - **API**: `http://localhost:8000`
+   - **Health Check**: `http://localhost:8000/health`
+
+### Manual Gunicorn Deployment
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run with Gunicorn
+gunicorn --config gunicorn.conf.py app:app
+```
+
+### Production Files
+
+- **`Dockerfile`**: Containerized deployment configuration
+- **`docker-compose.yml`**: Multi-service deployment with Nginx
+- **`gunicorn.conf.py`**: Gunicorn WSGI server configuration
+- **`nginx.conf`**: Nginx reverse proxy configuration
+
+### Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `GOOGLE_API_KEY` | Google Gemini API key | Yes |
+| `FIREBASE_SERVICE_ACCOUNT_KEY` | Firebase service account JSON | Yes |
+| `PORT` | Server port (default: 8000) | No |
 
 ## Security Considerations
 
