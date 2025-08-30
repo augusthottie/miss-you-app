@@ -11,10 +11,33 @@ from db import (
 )
 from dotenv import load_dotenv
 from ai import generate_notify_message
+import os
 
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+
+# Configure app for production
+app.config['JSON_SORT_KEYS'] = False
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
+
+
+# Add security headers
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Strict-Transport-Security'] = \
+        'max-age=31536000; includeSubDomains'
+    return response
+
+
+@app.route("/health")
+def health_check():
+    """Health check endpoint for load balancers"""
+    return jsonify({"status": "healthy", "service": "miss-you-app"}), 200
 
 
 @app.route("/register", methods=["GET"])
@@ -26,7 +49,8 @@ def register_endpoint():
         return jsonify({"error": "Username is required"}), 400
 
     user_id = register(username)
-    register_device_token(user_id, device_token)
+    if device_token:
+        register_device_token(user_id, device_token)
 
     return jsonify({"user_id": user_id}), 200
 
@@ -102,6 +126,23 @@ def notifications_endpoint():
     return jsonify({"notifications": notifications}), 200
 
 
+# Error handlers
+@app.errorhandler(404)
+def not_found(_):
+    return jsonify({"error": "Endpoint not found"}), 404
+
+
+@app.errorhandler(500)
+def internal_error(_):
+    return jsonify({"error": "Internal server error"}), 500
+
+
 if __name__ == "__main__":
+    # Initialize database
     init_db()
-    app.run(debug=True)
+
+    # Get port from environment or default to 8000
+    port = int(os.getenv('PORT', 8000))
+
+    # Run in production mode
+    app.run(host='0.0.0.0', port=port, debug=False)
