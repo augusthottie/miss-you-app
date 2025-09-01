@@ -151,8 +151,10 @@ def notify(source_id, target_id, title, description):
     """Send notification to a user"""
     conn = psycopg.connect(DATABASE_URL)
     try:
+        source_user_id = get_user(source_id)
+        target_user_id = get_user(target_id)
         # Get the target user's device tokens
-        device_tokens = get_user_device_tokens(target_id)
+        device_tokens = get_user_device_tokens(target_user_id)
 
         if not device_tokens:
             print(f"No device tokens found for user {target_id}")
@@ -182,7 +184,7 @@ def notify(source_id, target_id, title, description):
                 'INSERT INTO notifications '
                 '(source_id, target_id, title, description) '
                 'VALUES (%s, %s, %s, %s)',
-                (source_id, target_id, title, description)
+                (source_user_id, target_user_id, title, description)
             )
         conn.commit()
 

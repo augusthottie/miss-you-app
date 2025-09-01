@@ -14,7 +14,7 @@ try:
     api_key = os.getenv("GOOGLE_API_KEY")
     if api_key:
         genai.configure(api_key=api_key)
-        gemini_model = genai.GenerativeModel('gemini-pro')
+        gemini_model = genai.GenerativeModel('gemini-2.0-flash')
         gemini_available = True
         print("Gemini AI initialized successfully")
     else:
