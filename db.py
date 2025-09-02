@@ -240,7 +240,7 @@ def get_notifications(user_id):
         with conn.cursor(row_factory=psycopg.rows.dict_row) as cursor:
             cursor.execute(
                 'SELECT id, title, description, created_at, is_read '
-                'FROM notifications WHERE target_id = %s AND is_read = FALSE',
+                'FROM notifications WHERE target_id = %s',
                 (user_id,)
             )
             results = cursor.fetchall()
