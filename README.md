@@ -1,19 +1,22 @@
-# Miss You App
+# Miss You App - Backend
 
-A Flask-based backend application for sending personalized "miss you" notifications with AI-generated messages using Google's Gemini AI and Firebase Cloud Messaging for push notifications.
+A Flask-based **backend API** for sending personalized "miss you" notifications with AI-generated messages using Google's Gemini AI and Firebase Cloud Messaging for push notifications.
+
+> **Note**: This is the backend service only. The frontend is an iOS app built with SwiftUI that communicates with this API.
 
 ## Features
 
 - 🤖 **AI-Generated Messages**: Uses Google Gemini AI to create personalized, heartfelt messages
 - 📱 **Push Notifications**: Firebase Cloud Messaging integration for iOS/Android notifications
 - 👥 **User Management**: Register users and manage device tokens
-- 💾 **SQLite Database**: Lightweight database for storing users, notifications, and device tokens
+- 💾 **PostgreSQL Database**: Robust database for storing users, notifications, and device tokens
 - 🔔 **Notification System**: Send, receive, and mark notifications as read
 
 ## Tech Stack
 
 - **Backend**: Flask (Python)
-- **Database**: SQLite
+- **Frontend**: iOS app built with SwiftUI (separate repository)
+- **Database**: PostgreSQL
 - **AI**: Google Gemini AI
 - **Push Notifications**: Firebase Cloud Messaging
 - **Environment Management**: python-dotenv
@@ -28,7 +31,7 @@ A Flask-based backend application for sending personalized "miss you" notificati
 - PostgreSQL database (local or cloud)
 - Google Gemini API key
 - Firebase project with service account key
-- iOS/Android app for receiving notifications
+- iOS app (SwiftUI frontend) for receiving notifications
 
 ## Installation
 
@@ -251,7 +254,10 @@ Example AI-generated messages:
 
 ## Push Notifications
 
-The app supports Firebase Cloud Messaging for sending push notifications to iOS and Android devices. Device tokens are stored in the database and used to send notifications.
+The app uses Firebase Cloud Messaging (FCM) for sending push notifications to the iOS app. Device tokens are registered when users sign up through the iOS app and are stored in the database.
+
+### Docker Limitation
+> ⚠️ **Important**: FCM notifications cannot be tested when running the backend in Docker because Firebase Cloud Messaging requires direct communication with Apple's push notification servers, which is not supported in containerized environments. For testing notifications, deploy the backend to a cloud service like Railway, Heroku, or similar platforms.
 
 ## Development
 
@@ -289,19 +295,28 @@ miss-you-app/
 
 ## Production Deployment
 
-The app includes production-ready deployment configurations for containerized environments.
+### Recommended: Cloud Platform Deployment
 
-### Docker Deployment
+For full functionality including Firebase Cloud Messaging, deploy to cloud platforms such as:
+- **Railway** (recommended)
+- **Heroku**
+- **Google Cloud Run**
+- **AWS App Runner**
+- **DigitalOcean App Platform**
+
+### Docker Deployment (Development Only)
+
+> ⚠️ **Note**: While the backend runs perfectly in Docker, **Firebase Cloud Messaging notifications will not work** in containerized environments. Use Docker for development and API testing, but deploy to cloud platforms for full notification functionality.
 
 1. **Prerequisites:**
    - Docker and Docker Compose installed
-   - Environment variables set up
+   - Environment variables set up in `.env` file
 
 2. **Quick Start:**
    ```bash
-   # Set environment variables
-   export GOOGLE_API_KEY="your_gemini_api_key"
-   export FIREBASE_SERVICE_ACCOUNT_KEY='{"type":"service_account",...}'
+   # Ensure your .env file contains:
+   # GOOGLE_API_KEY=your_gemini_api_key
+   # FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account",...}
 
    # Build and run
    docker-compose up --build -d
@@ -310,6 +325,7 @@ The app includes production-ready deployment configurations for containerized en
 3. **Access your app:**
    - **API**: `http://localhost:8000`
    - **Health Check**: `http://localhost:8000/health`
+   - **Note**: `/notify` endpoint will work but notifications won't be delivered
 
 ### Manual Gunicorn Deployment
 
