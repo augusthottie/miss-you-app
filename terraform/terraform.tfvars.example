@@ -1,0 +1,45 @@
+# AWS Configuration
+aws_region  = "us-east-1"
+environment = "prod"
+
+# Project Configuration
+project_name = "miss-you-app"
+
+# VPC Configuration
+vpc_cidr           = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+# Database Configuration
+db_name             = "miss_you_app"
+db_username         = "postgres"
+db_password         = "CHANGE_ME_TO_SECURE_PASSWORD"  # Change this!
+db_instance_class   = "db.t3.micro"
+db_allocated_storage = 20
+
+# ECS Configuration
+app_port       = 8000
+app_count      = 2
+fargate_cpu    = "512"
+fargate_memory = "1024"
+health_check_path = "/health"
+
+# Application Secrets
+google_api_key = "YOUR_GOOGLE_GEMINI_API_KEY"  # Get from Google AI Studio
+firebase_service_account_key = <<-EOT
+{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "...",
+  "private_key": "...",
+  "client_email": "...",
+  "client_id": "...",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "..."
+}
+EOT
+
+# Domain Configuration (Optional - leave empty for ALB DNS only)
+domain_name          = ""  # e.g., "api.example.com"
+create_route53_record = false
