@@ -28,20 +28,20 @@ resource "aws_db_instance" "postgresql" {
   vpc_security_group_ids = [aws_security_group.rds.id]
 
   # High Availability
-  multi_az               = var.environment == "prod" ? true : false
-  publicly_accessible    = false
+  multi_az                = var.environment == "prod" ? true : false
+  publicly_accessible     = false
   backup_retention_period = 7
-  backup_window          = "03:00-04:00"
-  maintenance_window     = "mon:04:00-mon:05:00"
+  backup_window           = "03:00-04:00"
+  maintenance_window      = "mon:04:00-mon:05:00"
 
   # Performance Insights
-  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-  performance_insights_enabled    = true
+  enabled_cloudwatch_logs_exports       = ["postgresql", "upgrade"]
+  performance_insights_enabled          = true
   performance_insights_retention_period = 7
 
   # Deletion protection
-  deletion_protection = var.environment == "prod" ? true : false
-  skip_final_snapshot = var.environment != "prod"
+  deletion_protection       = var.environment == "prod" ? true : false
+  skip_final_snapshot       = var.environment != "prod"
   final_snapshot_identifier = var.environment == "prod" ? "${var.project_name}-final-snapshot-${formatdate("YYYY-MM-DD-hhmm", timestamp())}" : null
 
   tags = {

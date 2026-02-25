@@ -80,7 +80,7 @@ output "domain_name" {
 
 output "deployment_instructions" {
   description = "Next steps for deployment"
-  value = <<-EOT
+  value       = <<-EOT
 
     ====================================
     DEPLOYMENT INSTRUCTIONS

@@ -189,7 +189,7 @@ resource "aws_ecs_service" "app" {
     container_port   = var.app_port
   }
 
-  health_check_grace_period_seconds = 60
+  health_check_grace_period_seconds  = 60
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
 
